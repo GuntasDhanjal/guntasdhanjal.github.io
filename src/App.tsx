@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Navigation from "./components/Navigation";
+import { Navigation } from "./components/Navigation";
 
 import Home from "./pages/Home";
 import Projects from "./pages/Projects";
@@ -14,10 +14,10 @@ export default function App() {
   return (
     <BrowserRouter>
       <div className="min-h-screen flex flex-col bg-background text-foreground">
-        {/* Navigation bar */}
+        {/* Top navigation bar */}
         <Navigation />
 
-        {/* Main content */}
+        {/* Page content */}
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
