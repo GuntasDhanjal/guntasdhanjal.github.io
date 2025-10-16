@@ -1,65 +1,41 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { HashRouter as BrowserRouter, Routes, Route } from "react-router-dom";
-import { useEffect } from "react";
-import { Navigation } from "./components/Navigation";
-import { Footer } from "./components/Footer";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Navigation from "./components/Navigation";
+
 import Home from "./pages/Home";
 import Projects from "./pages/Projects";
 import Apps from "./pages/Apps";
+import AppDetails from "./pages/AppDetails";
 import Writing from "./pages/Writing";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
-
-// GitHub Pages SPA redirect handler
-const redirectToCorrectPath = () => {
-  const l = window.location;
-  
-  // Check if this is a redirect from 404.html
-  if (l.search.includes('/?')) {
-    // Extract the path from the query parameter
-    const pathMatch = l.search.match(/\?\/\?([^&]*)/);
-    if (pathMatch) {
-      const path = pathMatch[1].replace(/~and~/g, '&');
-      // Clean up the search params
-      const cleanSearch = l.search.replace(/\?\/\?[^&]*&?/, '').replace(/^&/, '');
-      const newUrl = path + (cleanSearch ? '?' + cleanSearch : '') + l.hash;
-      window.history.replaceState(null, '', newUrl);
-    }
-  }
-};
-
-const App = () => {
-  useEffect(() => {
-    redirectToCorrectPath();
-  }, []);
-
+export default function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Navigation />
+    <BrowserRouter>
+      <div className="min-h-screen flex flex-col bg-background text-foreground">
+        {/* Navigation bar */}
+        <Navigation />
+
+        {/* Main content */}
+        <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/apps" element={<Apps />} />
+            <Route path="/apps/:id" element={<AppDetails />} />
             <Route path="/writing" element={<Writing />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-          <Footer />
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
-  );
-};
+        </main>
 
-export default App;
+        {/* Optional footer */}
+        <footer className="text-center py-6 text-sm text-muted-foreground border-t mt-12">
+          © {new Date().getFullYear()} Blue and Gold Healthcare Inc. All rights reserved.
+        </footer>
+      </div>
+    </BrowserRouter>
+  );
+}
