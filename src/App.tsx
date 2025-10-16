@@ -18,29 +18,19 @@ const queryClient = new QueryClient();
 
 // GitHub Pages SPA redirect handler
 const redirectToCorrectPath = () => {
-  const pathSegmentsToKeep = 0;
   const l = window.location;
-  let redirect: string | undefined;
-
-  // If this is a redirect from 404.html
-  if (l.search) {
-    const p = l.search.slice(1).split('&');
-    if (p.some(part => part.slice(0, 2) === '/?')) {
-      const segments = p
-        .filter(part => part.slice(0, 2) === '/?')[0]
-        .slice(2)
-        .split('/')
-        .map(s => s.replace(/~and~/g, '&'));
-      const s = l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep);
-      l.search = '?' + p.filter(part => part.slice(0, 2) !== '/?').join('&');
-      l.pathname = s.join('/') + '/' + segments.join('/');
-      redirect = l.pathname + l.search + l.hash;
+  
+  // Check if this is a redirect from 404.html
+  if (l.search.includes('/?')) {
+    // Extract the path from the query parameter
+    const pathMatch = l.search.match(/\?\/\?([^&]*)/);
+    if (pathMatch) {
+      const path = pathMatch[1].replace(/~and~/g, '&');
+      // Clean up the search params
+      const cleanSearch = l.search.replace(/\?\/\?[^&]*&?/, '').replace(/^&/, '');
+      const newUrl = path + (cleanSearch ? '?' + cleanSearch : '') + l.hash;
+      window.history.replaceState(null, '', newUrl);
     }
-  }
-
-  // If we have a redirect, perform it
-  if (redirect) {
-    window.history.replaceState(null, '', redirect);
   }
 };
 
