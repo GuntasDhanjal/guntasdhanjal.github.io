@@ -7,9 +7,9 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 
 const navItems = [
   { label: "Home", path: "/" },
-  { label: "Projects", path: "/projects" },
   { label: "Apps", path: "/apps" },
-  { label: "Writing", path: "/writing" },
+  { label: "Competitions", path: "/competitions" },
+  { label: "Projects", path: "/projects" },
   { label: "About", path: "/about" },
   { label: "Contact", path: "/contact" },
 ];

@@ -5,7 +5,7 @@ import Home from "./pages/Home";
 import Projects from "./pages/Projects";
 import Apps from "./pages/Apps";
 import AppDetails from "./pages/AppDetails";
-import Writing from "./pages/Writing";
+import Writing from "./pages/Competitions";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
@@ -21,14 +21,15 @@ export default function App() {
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/projects" element={<Projects />} />
-            <Route path="/apps" element={<Apps />} />
-            <Route path="/apps/:id" element={<AppDetails />} />
-            <Route path="/writing" element={<Writing />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
+	    <Route path="/apps" element={<Apps />} />
+	    <Route path="/apps/:id" element={<AppDetails />} />
+	    <Route path="/competitions" element={<Competitions />} />
+	    <Route path="/projects" element={<Projects />} />
+	    <Route path="/about" element={<About />} />
+	    <Route path="/contact" element={<Contact />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+
         </main>
 
         {/* Optional footer */}
