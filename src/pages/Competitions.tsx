@@ -158,10 +158,22 @@ function ImgWithFallback({
   );
 }
 
+/* -----------------------------
+   Medal helpers
+------------------------------ */
+function medalForRank(rank?: number) {
+  if (rank == null) return null;
+  if (rank >= 1 && rank <= 10) return { emoji: "🥇", label: "Gold" };
+  if (rank >= 11 && rank <= 50) return { emoji: "🥈", label: "Silver" };
+  if (rank >= 51 && rank <= 100) return { emoji: "🥉", label: "Bronze" };
+  return null;
+}
+
+/* -----------------------------
+   Component
+------------------------------ */
 export default function Competitions() {
-  /* -----------------------------
-     🏆 Hosted Competitions
-  ------------------------------ */
+  // 🏆 Hosted
   const hosted = [
     {
       id: "xray-a",
@@ -191,20 +203,29 @@ export default function Competitions() {
     },
   ];
 
-  /* -----------------------------
-     ⚔️ Participated Competitions
-     (Top two are ongoing with medals; then completed ones)
-  ------------------------------ */
-  const participated = [
-    // Ongoing first
+  // ⚔️ Participated (ongoing first, then completed)
+  type Comp = {
+    id: string;
+    title: string;
+    status: "Ongoing" | "Completed";
+    description: string;
+    participants: number;
+    rank?: number;
+    kaggleImage?: string;
+    fallback: string;
+    link: string;
+  };
+
+  const participated: Comp[] = [
+    // Ongoing
     {
       id: "physionet-ecg",
       title: "PhysioNet – Digitization of ECG Images",
-      medalEmoji: "🥇",
-      tags: ["Research", "Ongoing"],
-      participants: "4,000+",
+      status: "Ongoing",
       description:
         "Deep learning to digitize ECG waveforms from scanned/photographed paper records for better clinical accessibility.",
+      participants: 4109,
+      rank: 9,
       kaggleImage:
         "https://storage.googleapis.com/kaggle-competitions/kaggle/57757/logos/thumb76_57757.png",
       fallback: FALLBACK_PHYSIONET,
@@ -213,26 +234,26 @@ export default function Competitions() {
     {
       id: "cafa6",
       title: "CAFA 6 – Protein Function Prediction",
-      medalEmoji: "🥈",
-      tags: ["Research", "Ongoing"],
-      participants: "4,000+",
+      status: "Ongoing",
       description:
         "Predicting protein functions from sequence embeddings via multi-label learning to support functional genomics.",
+      participants: 3985,
+      rank: 34,
       kaggleImage:
         "https://storage.googleapis.com/kaggle-competitions/kaggle/57605/logos/thumb76_57605.png",
       fallback: FALLBACK_CAFA6,
       link: "https://www.kaggle.com/competitions/cafa-6-protein-function-prediction/overview",
     },
 
-    // Completed (no category badges as requested)
+    // Completed
     {
       id: "rsna",
       title: "RSNA Intracranial Aneurysm Detection",
-      medalEmoji: undefined,
-      tags: [],
-      participants: "1,147",
+      status: "Completed",
       description:
         "3D-CT pipeline for aneurysm detection: robust preprocessing, augmentation, and ensemble modeling to improve sensitivity.",
+      participants: 1147,
+      rank: 264,
       kaggleImage:
         "https://storage.googleapis.com/kaggle-competitions/kaggle/52368/logos/thumb76_52368.png",
       fallback: FALLBACK_RSNA,
@@ -241,11 +262,11 @@ export default function Competitions() {
     {
       id: "hms",
       title: "HMS – Harmful Brain Activity Classification",
-      medalEmoji: undefined,
-      tags: [],
-      participants: "962",
+      status: "Completed",
       description:
         "EEG time-series modeling with 1D CNNs and temporal attention. Focus on denoising, channel features, and fold stability.",
+      participants: 962,
+      rank: 318,
       kaggleImage:
         "https://storage.googleapis.com/kaggle-competitions/kaggle/52416/logos/thumb76_52416.png",
       fallback: FALLBACK_EEG,
@@ -254,11 +275,11 @@ export default function Competitions() {
     {
       id: "play9",
       title: "Playground Series S5E9",
-      medalEmoji: undefined,
-      tags: [],
-      participants: "872",
+      status: "Completed",
       description:
         "Structured data task with feature engineering and gradient boosting; careful regularization and CV alignment.",
+      participants: 872,
+      rank: 118,
       kaggleImage:
         "https://storage.googleapis.com/kaggle-competitions/kaggle/54457/logos/thumb76_54457.png",
       fallback: FALLBACK_PLAYGROUND,
@@ -267,11 +288,11 @@ export default function Competitions() {
     {
       id: "play8",
       title: "Playground Series S5E8",
-      medalEmoji: undefined,
-      tags: [],
-      participants: "901",
+      status: "Completed",
       description:
         "Bank marketing classification with tuned tree ensembles; handled class imbalance and leakage checks.",
+      participants: 901,
+      rank: 142,
       kaggleImage:
         "https://storage.googleapis.com/kaggle-competitions/kaggle/54175/logos/thumb76_54175.png",
       fallback: FALLBACK_PLAYGROUND,
@@ -280,11 +301,11 @@ export default function Competitions() {
     {
       id: "fake-or-real",
       title: "Fake or Real: The Impostor Hunt",
-      medalEmoji: undefined,
-      tags: [],
-      participants: "611",
+      status: "Completed",
       description:
         "NLP impostor detection with BERT; tokenization strategy and adversarial augmentation for robustness.",
+      participants: 611,
+      rank: 221,
       kaggleImage:
         "https://storage.googleapis.com/kaggle-competitions/kaggle/51732/logos/thumb76_51732.png",
       fallback: FALLBACK_NLP,
@@ -293,11 +314,11 @@ export default function Competitions() {
     {
       id: "trojan-horse",
       title: "Trojan Horse Hunt in Space",
-      medalEmoji: undefined,
-      tags: [],
-      participants: "564",
+      status: "Completed",
       description:
         "Spectral features + time-series forecasting to locate hidden anomalies; FFT filtering and dimensionality reduction.",
+      participants: 564,
+      rank: 183,
       kaggleImage:
         "https://storage.googleapis.com/kaggle-competitions/kaggle/53214/logos/thumb76_53214.png",
       fallback: FALLBACK_SPACE,
@@ -361,39 +382,59 @@ export default function Competitions() {
           </header>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {participated.map((comp) => (
-              <Card key={comp.id} className="hover:shadow-lg transition-shadow overflow-hidden flex flex-col">
-                <div className="relative h-40 bg-muted overflow-hidden">
-                  <ImgWithFallback
-                    src={comp.kaggleImage}
-                    fallback={comp.fallback}
-                    alt={`${comp.title} thumbnail`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+            {participated.map((comp) => {
+              const medal = medalForRank(comp.rank);
+              return (
+                <Card key={comp.id} className="hover:shadow-lg transition-shadow overflow-hidden flex flex-col">
+                  <div className="relative h-40 bg-muted overflow-hidden">
+                    <ImgWithFallback
+                      src={comp.kaggleImage}
+                      fallback={comp.fallback}
+                      alt={`${comp.title} thumbnail`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
 
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold mb-1 flex items-center flex-wrap gap-2">
-                    {comp.title}
-                    {comp.medalEmoji && <span className="text-base">{comp.medalEmoji}</span>}
-                    {/* Tags (e.g., Research, Ongoing) */}
-                    {comp.tags.map((t) => (
-                      <Badge key={t} variant="secondary">{t}</Badge>
-                    ))}
-                  </CardTitle>
-                </CardHeader>
+                  <CardHeader>
+                    <CardTitle className="text-lg font-semibold mb-1 flex items-center flex-wrap gap-2">
+                      {comp.title}
+                      <Badge
+                        className={
+                          comp.status === "Ongoing"
+                            ? "bg-primary text-primary-foreground"
+                            : ""
+                        }
+                        variant={comp.status === "Completed" ? "secondary" : "default"}
+                      >
+                        {comp.status}
+                      </Badge>
+                    </CardTitle>
+                  </CardHeader>
 
-                <CardContent className="flex-1 flex flex-col justify-between">
-                  <p className="text-sm text-muted-foreground mb-3 line-clamp-5">{comp.description}</p>
-                  <div className="text-sm text-muted-foreground mb-4">Participants: {comp.participants}</div>
-                  <Button asChild>
-                    <a href={comp.link} target="_blank" rel="noopener noreferrer">
-                      View on Kaggle <ExternalLink className="ml-2 w-4 h-4" />
-                    </a>
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+                  <CardContent className="flex-1 flex flex-col justify-between">
+                    <p className="text-sm text-muted-foreground mb-3 line-clamp-5">
+                      {comp.description}
+                    </p>
+                    <div className="text-sm text-muted-foreground mb-4 space-y-1">
+                      {medal && (
+                        <p>
+                          Medal: {medal.emoji} {medal.label}
+                        </p>
+                      )}
+                      {typeof comp.rank === "number" && (
+                        <p>Rank: {comp.rank} / {comp.participants}</p>
+                      )}
+                      <p>Participants: {comp.participants.toLocaleString()}</p>
+                    </div>
+                    <Button asChild>
+                      <a href={comp.link} target="_blank" rel="noopener noreferrer">
+                        View on Kaggle <ExternalLink className="ml-2 w-4 h-4" />
+                      </a>
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </section>
 
