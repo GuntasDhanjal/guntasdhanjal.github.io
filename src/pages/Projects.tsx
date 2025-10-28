@@ -14,45 +14,23 @@ type Project = {
   rank?: string;
   image?: string;
   link: string;
+  updated?: string;
 };
 
 export default function Projects() {
   const [projects, setProjects] = useState<Project[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Static fallback (top projects)
+  // 🧱 Static fallback
   const staticProjects: Project[] = [
-    {
-      id: "grand-xray-slam",
-      title: "Grand X-Ray Slam",
-      platform: "Kaggle",
-      medal: "🥇 Organizer / Lead",
-      rank: "1,000+ participants",
-      description:
-        "Global healthcare AI competition democratizing chest X-ray model development with inclusive datasets and open access.",
-      image:
-        "https://storage.googleapis.com/kaggle-competitions/kaggle/48231/logos/thumb76_48231.png",
-      link: "https://www.kaggle.com/competitions/grand-xray-slam-division-a",
-    },
-    {
-      id: "ai-global-health",
-      title: "AI for Global Health (Research)",
-      platform: "Kaggle",
-      medal: "🏅 Gold Notebook",
-      rank: "Top 5%",
-      description:
-        "Explored how AI impacts healthcare equity, published research on algorithmic bias and accessibility in global health systems.",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/7/7c/Artificial_intelligence_in_healthcare_logo.png",
-      link: "https://www.kaggle.com/guntasdhanjal",
-    },
     {
       id: "nurse-ai",
       title: "Nurse AI",
       platform: "GitHub",
       description:
-        "iOS app providing AI-powered assistance for nurses—built using GPT-based summarization and FHIR data structures.",
-      image: "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/a8/35/f0/a835f0b9-5c14-7bda-fc36-1de83b9fda7f/AppIcon-0-0-1x_U007emarketing-0-7-0-85-220.png/460x0w.webp",
+        "iOS app providing AI-powered assistance for nurses — GPT-based summarization, FHIR data, and HealthKit integration.",
+      image:
+        "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/a8/35/f0/a835f0b9-5c14-7bda-fc36-1de83b9fda7f/AppIcon-0-0-1x_U007emarketing-0-7-0-85-220.png/460x0w.webp",
       link: "https://apps.apple.com/us/app/nurse-ai/id6748453188",
     },
     {
@@ -60,8 +38,9 @@ export default function Projects() {
       title: "Dr HealthAgent",
       platform: "GitHub",
       description:
-        "AI health companion integrating data summarization, unified patient records, and proactive insights. Designed with Apple HealthKit APIs.",
-      image: "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/a2/f2/43/a2f2432e-e28c-2a05-317f-3a0eb3f2d6c5/AppIcon-0-0-1x_U007emarketing-0-7-0-85-220.png/460x0w.webp",
+        "AI health companion app integrating unified patient records and proactive health insights.",
+      image:
+        "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/a2/f2/43/a2f2432e-e28c-2a05-317f-3a0eb3f2d6c5/AppIcon-0-0-1x_U007emarketing-0-7-0-85-220.png/460x0w.webp",
       link: "https://apps.apple.com/us/app/dr-healthagent/id6748384868",
     },
     {
@@ -69,8 +48,9 @@ export default function Projects() {
       title: "School TaskFlow Task Manager",
       platform: "GitHub",
       description:
-        "Task management app for students featuring scheduling, analytics, and intelligent prioritization.",
-      image: "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/b2/14/7b/b2147b20-7a4a-1c8e-06e2-03ac680c44b3/AppIcon-0-0-1x_U007emarketing-0-7-0-85-220.png/460x0w.webp",
+        "Task management app for students with scheduling, focus timers, and intelligent task insights.",
+      image:
+        "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/b2/14/7b/b2147b20-7a4a-1c8e-06e2-03ac680c44b3/AppIcon-0-0-1x_U007emarketing-0-7-0-85-220.png/460x0w.webp",
       link: "https://apps.apple.com/us/app/school-taskflow-task-manager/id6740080563",
     },
     {
@@ -78,8 +58,9 @@ export default function Projects() {
       title: "School Shark Tank",
       platform: "GitHub",
       description:
-        "Gamified entrepreneurship learning app that lets students simulate startup pitches and earn virtual investments.",
-      image: "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/2a/3a/ab/2a3aab47-780b-09d3-bfc7-b24880bbde95/AppIcon-0-0-1x_U007emarketing-0-7-0-85-220.png/460x0w.webp",
+        "Gamified entrepreneurship app that lets students pitch startup ideas and earn virtual investments.",
+      image:
+        "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/2a/3a/ab/2a3aab47-780b-09d3-bfc7-b24880bbde95/AppIcon-0-0-1x_U007emarketing-0-7-0-85-220.png/460x0w.webp",
       link: "https://apps.apple.com/us/app/school-shark-tank/id6744159123",
     },
   ];
@@ -87,6 +68,7 @@ export default function Projects() {
   useEffect(() => {
     (async () => {
       try {
+        // Fetch from Kaggle and GitHub in parallel
         const [kaggleRes, githubRes] = await Promise.allSettled([
           fetch("https://www.kaggle.com/api/v1/users/guntasdhanjal/kernels", {
             headers: { Accept: "application/json" },
@@ -94,6 +76,7 @@ export default function Projects() {
           fetch("https://api.github.com/users/GuntasDhanjal/repos?sort=updated&per_page=10"),
         ]);
 
+        // 🧠 Kaggle projects
         const kaggleProjects: Project[] =
           kaggleRes.status === "fulfilled" && kaggleRes.value.ok
             ? ((await kaggleRes.value.json()) || []).map((k: any) => ({
@@ -107,9 +90,11 @@ export default function Projects() {
                   k.thumbnailUrl ||
                   "https://storage.googleapis.com/kaggle-competitions/kaggle/50738/logos/thumb76_50738.png",
                 link: `https://www.kaggle.com/${k.authorName}/code/${k.ref}`,
+                updated: k.updated || k.creationTime,
               }))
             : [];
 
+        // 🧩 GitHub projects
         const githubProjects: Project[] =
           githubRes.status === "fulfilled" && githubRes.value.ok
             ? ((await githubRes.value.json()) || []).map((g: any) => ({
@@ -121,11 +106,20 @@ export default function Projects() {
                   g.owner?.avatar_url ||
                   "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
                 link: g.html_url,
+                updated: g.updated_at,
               }))
             : [];
 
-        const combined = [...kaggleProjects, ...githubProjects];
-        setProjects(combined.length > 0 ? combined : staticProjects);
+        // 🧮 Merge & sort by updated date
+        const all = [...kaggleProjects, ...githubProjects];
+        const sorted =
+          all.length > 0
+            ? all.sort(
+                (a, b) => new Date(b.updated || 0).getTime() - new Date(a.updated || 0).getTime()
+              )
+            : staticProjects;
+
+        setProjects(sorted);
       } catch (err) {
         console.error("Error loading projects", err);
         setError("Could not fetch live projects. Showing static list instead.");
@@ -140,7 +134,8 @@ export default function Projects() {
         <header className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-3">Projects</h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            A collection of open-source, competition, and research projects from Kaggle and GitHub.
+            A unified view of Kaggle notebooks and GitHub code projects —
+            blending data science, AI, and app development.
           </p>
         </header>
 
@@ -187,14 +182,13 @@ export default function Projects() {
                 )}
               </div>
               <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle className="text-lg font-semibold mb-1">{proj.title}</CardTitle>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Badge variant="secondary">{proj.platform}</Badge>
-                      {proj.medal && <Badge className="bg-yellow-200 text-yellow-800">{proj.medal}</Badge>}
-                    </div>
-                  </div>
+                <CardTitle className="text-lg font-semibold mb-1">{proj.title}</CardTitle>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Badge variant="secondary">{proj.platform}</Badge>
+                  {proj.medal && (
+                    <Badge className="bg-yellow-200 text-yellow-800">{proj.medal}</Badge>
+                  )}
+                  {proj.rank && <span>{proj.rank}</span>}
                 </div>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col justify-between">
