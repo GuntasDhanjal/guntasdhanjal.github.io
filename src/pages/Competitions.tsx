@@ -1,3 +1,4 @@
+// src/pages/Competitions.tsx
 import { useState } from "react";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -5,13 +6,13 @@ import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
 
 /* -----------------------------
-   Safe UTF-8 → Base64 helper (fixes InvalidCharacterError)
+   UTF-8 safe SVG→Base64 helper
 ------------------------------ */
 const svgToDataUrl = (svg: string) =>
   `data:image/svg+xml;base64,${window.btoa(unescape(encodeURIComponent(svg)))}`;
 
 /* -----------------------------
-   Medium-contrast pastel SVG fallbacks (base64 inline)
+   Medium-contrast pastel SVG fallbacks (inline, themed)
 ------------------------------ */
 const FRAME = (a: string, b: string) => `
 <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 360'>
@@ -24,83 +25,115 @@ const FRAME = (a: string, b: string) => `
   <rect width='640' height='360' rx='28' ry='28' fill='url(#g)'/>
   <rect x='18' y='18' width='604' height='324' rx='22' ry='22' fill='rgba(255,255,255,0.14)'/>
 `;
-
 const END = `</svg>`;
 
-// Medical imaging (X-ray)
+// Medical imaging (X-ray) — teal → steel
 const FALLBACK_XRAY = svgToDataUrl(
   FRAME("#1fb6aa", "#3a6073") +
     `<g opacity=".55">
        <rect x="90" y="70" width="460" height="220" rx="18" fill="rgba(0,0,0,.25)"/>
-       <circle cx="320" cy="180" r="62" fill="rgba(255,255,255,.15)"/>
+       <rect x="110" y="90" width="420" height="180" rx="12" fill="rgba(255,255,255,.08)"/>
+       <rect x="200" y="110" width="240" height="140" rx="8" fill="rgba(255,255,255,.16)"/>
+       <circle cx="320" cy="180" r="62" fill="rgba(0,0,0,.25)"/>
+       <rect x="160" y="260" width="320" height="10" rx="5" fill="rgba(255,255,255,.35)"/>
      </g>` +
     END
 );
 
-// Brain / RSNA
+// Brain / RSNA — blue → navy
 const FALLBACK_RSNA = svgToDataUrl(
   FRAME("#4f86ff", "#0a2540") +
     `<g opacity=".5">
-       <circle cx="320" cy="180" r="90" fill="rgba(255,255,255,.12)"/>
-       <path d="M180 180 Q320 60 460 180 Q320 300 180 180Z" fill="rgba(255,255,255,.10)"/>
+       <circle cx="210" cy="170" r="62" fill="rgba(255,255,255,.10)"/>
+       <circle cx="260" cy="170" r="70" fill="rgba(255,255,255,.12)"/>
+       <circle cx="310" cy="170" r="78" fill="rgba(255,255,255,.14)"/>
+       <circle cx="360" cy="170" r="70" fill="rgba(255,255,255,.12)"/>
+       <circle cx="410" cy="170" r="62" fill="rgba(255,255,255,.10)"/>
+       <rect x="140" y="250" width="360" height="8" rx="4" fill="rgba(255,255,255,.35)"/>
      </g>` +
     END
 );
 
-// EEG / HMS
+// EEG / HMS — violet → cyan
 const FALLBACK_EEG = svgToDataUrl(
   FRAME("#6d5bd0", "#1ec8e1") +
-    `<g stroke="rgba(255,255,255,.7)" stroke-width="3" fill="none" opacity=".8">
-       <path d="M40,200 C90,160 140,240 190,190 C240,140 290,260 340,210 C390,160 440,250 490,210 C540,170 590,240 640,210"/>
+    `<g stroke="rgba(255,255,255,.65)" stroke-width="3" fill="none" opacity=".8">
+       <path d="M40,220 C90,160 140,280 190,200 C240,120 290,260 340,190 C390,120 440,260 490,190 C540,120 590,250 640,200" />
+       <path d="M40,260 C90,200 140,300 190,220 C240,140 290,280 340,210 C390,140 440,280 490,210 C540,140 590,270 640,220" opacity=".6"/>
      </g>` +
     END
 );
 
-// Playground
+// Playground — sky → slate with bars
 const FALLBACK_PLAYGROUND = svgToDataUrl(
   FRAME("#60a5fa", "#334155") +
-    `<g opacity=".3">
+    `<g opacity=".35">
        ${Array.from({ length: 8 })
          .map(
            (_, i) =>
-             `<rect x="${60 + i * 60}" y="80" width="40" height="${
-               80 + (i % 3) * 30
-             }" rx="8" fill="rgba(255,255,255,.6)"/>`
+             `<rect x="${60 + i * 60}" y="70" width="40" height="${80 + ((i % 3) * 30)}" rx="8" fill="rgba(255,255,255,.5)"/>`
          )
          .join("")}
+       <rect x="60" y="240" width="520" height="10" rx="5" fill="rgba(255,255,255,.6)"/>
      </g>` +
     END
 );
 
-// NLP / Fake or Real
+// NLP — beige → lavender
 const FALLBACK_NLP = svgToDataUrl(
   FRAME("#d6c2a6", "#7c6f9f") +
-    `<g fill="rgba(255,255,255,.65)" font-family="monospace" font-size="18">
-       <text x="90" y="160">{text,label}</text>
-       <text x="90" y="190">→ tokenize()</text>
-       <text x="90" y="220">→ BERT → output</text>
+    `<g fill="rgba(255,255,255,.6)" font-family="ui-monospace, SFMono-Regular, Menlo" font-size="20">
+       <text x="80" y="150">{ text, label }</text>
+       <text x="80" y="185">tokenize(…)</text>
+       <text x="80" y="220">BERT → softmax</text>
      </g>` +
     END
 );
 
-// Space / Trojan Horse
+// Space — midnight → plum with stars
 const FALLBACK_SPACE = svgToDataUrl(
   FRAME("#0b1026", "#4b2a50") +
-    `<g fill="rgba(255,255,255,.85)">
-       ${Array.from({ length: 35 })
+    `<g fill="rgba(255,255,255,.8)">
+       ${Array.from({ length: 40 })
          .map(() => {
            const x = Math.floor(Math.random() * 620) + 10;
            const y = Math.floor(Math.random() * 340) + 10;
-           const r = Math.random() * 1.6 + 0.4;
+           const r = Math.random() * 1.8 + 0.6;
            return `<circle cx="${x}" cy="${y}" r="${r}"/>`;
          })
          .join("")}
+     </g>
+     <g opacity=".35" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2">
+       <circle cx="470" cy="180" r="60"/>
+       <circle cx="470" cy="180" r="90" stroke-dasharray="8 10"/>
+       <circle cx="470" cy="180" r="120" stroke-dasharray="5 12"/>
+     </g>` +
+    END
+);
+
+// Research ongoing — PhysioNet (teal-green)
+const FALLBACK_PHYSIONET = svgToDataUrl(
+  FRAME("#16a34a", "#0f766e") + // emerald → teal
+    `<g opacity=".55">
+       <rect x="100" y="90" width="440" height="180" rx="18" fill="rgba(255,255,255,.10)"/>
+       <path d="M80 200 C140 160, 200 240, 260 190 C320 140, 380 260, 440 210 C500 160, 560 240, 620 200" stroke="rgba(255,255,255,.75)" stroke-width="3" fill="none"/>
+     </g>` +
+    END
+);
+
+// Research ongoing — CAFA6 (lavender → navy)
+const FALLBACK_CAFA6 = svgToDataUrl(
+  FRAME("#8b5cf6", "#1e3a8a") + // violet → navy
+    `<g opacity=".5">
+       <circle cx="320" cy="140" r="54" fill="rgba(255,255,255,.15)"/>
+       <rect x="180" y="200" width="280" height="18" rx="9" fill="rgba(255,255,255,.35)"/>
+       <rect x="220" y="230" width="200" height="12" rx="6" fill="rgba(255,255,255,.35)"/>
      </g>` +
     END
 );
 
 /* -----------------------------
-   Helper <img> with fallback
+   <img> with fallback
 ------------------------------ */
 function ImgWithFallback({
   src,
@@ -125,10 +158,10 @@ function ImgWithFallback({
   );
 }
 
-/* -----------------------------
-   Component
------------------------------- */
 export default function Competitions() {
+  /* -----------------------------
+     🏆 Hosted Competitions
+  ------------------------------ */
   const hosted = [
     {
       id: "xray-a",
@@ -158,12 +191,45 @@ export default function Competitions() {
     },
   ];
 
+  /* -----------------------------
+     ⚔️ Participated Competitions
+     (Top two are ongoing with medals; then completed ones)
+  ------------------------------ */
   const participated = [
+    // Ongoing first
+    {
+      id: "physionet-ecg",
+      title: "PhysioNet – Digitization of ECG Images",
+      medalEmoji: "🥇",
+      tags: ["Research", "Ongoing"],
+      participants: "4,000+",
+      description:
+        "Deep learning to digitize ECG waveforms from scanned/photographed paper records for better clinical accessibility.",
+      kaggleImage:
+        "https://storage.googleapis.com/kaggle-competitions/kaggle/57757/logos/thumb76_57757.png",
+      fallback: FALLBACK_PHYSIONET,
+      link: "https://www.kaggle.com/competitions/physionet-ecg-image-digitization/overview",
+    },
+    {
+      id: "cafa6",
+      title: "CAFA 6 – Protein Function Prediction",
+      medalEmoji: "🥈",
+      tags: ["Research", "Ongoing"],
+      participants: "4,000+",
+      description:
+        "Predicting protein functions from sequence embeddings via multi-label learning to support functional genomics.",
+      kaggleImage:
+        "https://storage.googleapis.com/kaggle-competitions/kaggle/57605/logos/thumb76_57605.png",
+      fallback: FALLBACK_CAFA6,
+      link: "https://www.kaggle.com/competitions/cafa-6-protein-function-prediction/overview",
+    },
+
+    // Completed (no category badges as requested)
     {
       id: "rsna",
       title: "RSNA Intracranial Aneurysm Detection",
-      category: "Featured",
-      rank: "🏅 264 / 1147",
+      medalEmoji: undefined,
+      tags: [],
       participants: "1,147",
       description:
         "3D-CT pipeline for aneurysm detection: robust preprocessing, augmentation, and ensemble modeling to improve sensitivity.",
@@ -175,8 +241,8 @@ export default function Competitions() {
     {
       id: "hms",
       title: "HMS – Harmful Brain Activity Classification",
-      category: "Featured",
-      rank: "🏅 318 / 962",
+      medalEmoji: undefined,
+      tags: [],
       participants: "962",
       description:
         "EEG time-series modeling with 1D CNNs and temporal attention. Focus on denoising, channel features, and fold stability.",
@@ -188,8 +254,8 @@ export default function Competitions() {
     {
       id: "play9",
       title: "Playground Series S5E9",
-      category: "Playground",
-      rank: "🏅 118 / 872",
+      medalEmoji: undefined,
+      tags: [],
       participants: "872",
       description:
         "Structured data task with feature engineering and gradient boosting; careful regularization and CV alignment.",
@@ -201,8 +267,8 @@ export default function Competitions() {
     {
       id: "play8",
       title: "Playground Series S5E8",
-      category: "Playground",
-      rank: "🏅 142 / 901",
+      medalEmoji: undefined,
+      tags: [],
       participants: "901",
       description:
         "Bank marketing classification with tuned tree ensembles; handled class imbalance and leakage checks.",
@@ -214,8 +280,8 @@ export default function Competitions() {
     {
       id: "fake-or-real",
       title: "Fake or Real: The Impostor Hunt",
-      category: "Community",
-      rank: "🏅 221 / 611",
+      medalEmoji: undefined,
+      tags: [],
       participants: "611",
       description:
         "NLP impostor detection with BERT; tokenization strategy and adversarial augmentation for robustness.",
@@ -227,8 +293,8 @@ export default function Competitions() {
     {
       id: "trojan-horse",
       title: "Trojan Horse Hunt in Space",
-      category: "Community",
-      rank: "🏅 183 / 564",
+      medalEmoji: undefined,
+      tags: [],
       participants: "564",
       description:
         "Spectral features + time-series forecasting to locate hidden anomalies; FFT filtering and dimensionality reduction.",
@@ -309,8 +375,11 @@ export default function Competitions() {
                 <CardHeader>
                   <CardTitle className="text-lg font-semibold mb-1 flex items-center flex-wrap gap-2">
                     {comp.title}
-                    <Badge variant="secondary">{comp.category}</Badge>
-                    <span className="text-sm text-muted-foreground">{comp.rank}</span>
+                    {comp.medalEmoji && <span className="text-base">{comp.medalEmoji}</span>}
+                    {/* Tags (e.g., Research, Ongoing) */}
+                    {comp.tags.map((t) => (
+                      <Badge key={t} variant="secondary">{t}</Badge>
+                    ))}
                   </CardTitle>
                 </CardHeader>
 
