@@ -1,4 +1,3 @@
-// src/pages/Competitions.tsx
 import { useState } from "react";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,12 +5,14 @@ import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
 
 /* -----------------------------
-   Inline medium-contrast pastel SVG fallbacks (base64)
-   Each designed to hint the competition theme
+   Safe UTF-8 → Base64 helper (fixes InvalidCharacterError)
 ------------------------------ */
 const svgToDataUrl = (svg: string) =>
-  `data:image/svg+xml;base64,${btoa(svg.replace(/\n+/g, "").replace(/\s{2,}/g, " "))}`;
+  `data:image/svg+xml;base64,${window.btoa(unescape(encodeURIComponent(svg)))}`;
 
+/* -----------------------------
+   Medium-contrast pastel SVG fallbacks (base64 inline)
+------------------------------ */
 const FRAME = (a: string, b: string) => `
 <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 360'>
   <defs>
@@ -26,92 +27,80 @@ const FRAME = (a: string, b: string) => `
 
 const END = `</svg>`;
 
-// Medical imaging (X-ray): teal -> steel
+// Medical imaging (X-ray)
 const FALLBACK_XRAY = svgToDataUrl(
   FRAME("#1fb6aa", "#3a6073") +
     `<g opacity=".55">
        <rect x="90" y="70" width="460" height="220" rx="18" fill="rgba(0,0,0,.25)"/>
-       <rect x="110" y="90" width="420" height="180" rx="12" fill="rgba(255,255,255,.08)"/>
-       <rect x="200" y="110" width="240" height="140" rx="8" fill="rgba(255,255,255,.16)"/>
-       <circle cx="320" cy="180" r="62" fill="rgba(0,0,0,.25)"/>
-       <rect x="160" y="260" width="320" height="10" rx="5" fill="rgba(255,255,255,.35)"/>
+       <circle cx="320" cy="180" r="62" fill="rgba(255,255,255,.15)"/>
      </g>` +
     END
 );
 
-// Neuro / RSNA (brain): blue -> navy
+// Brain / RSNA
 const FALLBACK_RSNA = svgToDataUrl(
   FRAME("#4f86ff", "#0a2540") +
     `<g opacity=".5">
-       <circle cx="210" cy="170" r="62" fill="rgba(255,255,255,.10)"/>
-       <circle cx="260" cy="170" r="70" fill="rgba(255,255,255,.12)"/>
-       <circle cx="310" cy="170" r="78" fill="rgba(255,255,255,.14)"/>
-       <circle cx="360" cy="170" r="70" fill="rgba(255,255,255,.12)"/>
-       <circle cx="410" cy="170" r="62" fill="rgba(255,255,255,.10)"/>
-       <rect x="140" y="250" width="360" height="8" rx="4" fill="rgba(255,255,255,.35)"/>
+       <circle cx="320" cy="180" r="90" fill="rgba(255,255,255,.12)"/>
+       <path d="M180 180 Q320 60 460 180 Q320 300 180 180Z" fill="rgba(255,255,255,.10)"/>
      </g>` +
     END
 );
 
-// EEG / HMS: violet -> cyan
+// EEG / HMS
 const FALLBACK_EEG = svgToDataUrl(
   FRAME("#6d5bd0", "#1ec8e1") +
-    `<g stroke="rgba(255,255,255,.65)" stroke-width="3" fill="none" opacity=".8">
-       <path d="M40,220 C90,160 140,280 190,200 C240,120 290,260 340,190 C390,120 440,260 490,190 C540,120 590,250 640,200" />
-       <path d="M40,260 C90,200 140,300 190,220 C240,140 290,280 340,210 C390,140 440,280 490,210 C540,140 590,270 640,220" opacity=".6"/>
+    `<g stroke="rgba(255,255,255,.7)" stroke-width="3" fill="none" opacity=".8">
+       <path d="M40,200 C90,160 140,240 190,190 C240,140 290,260 340,210 C390,160 440,250 490,210 C540,170 590,240 640,210"/>
      </g>` +
     END
 );
 
-// Playground: sky -> slate with grid
+// Playground
 const FALLBACK_PLAYGROUND = svgToDataUrl(
   FRAME("#60a5fa", "#334155") +
-    `<g opacity=".35">
+    `<g opacity=".3">
        ${Array.from({ length: 8 })
          .map(
            (_, i) =>
-             `<rect x="${60 + i * 60}" y="70" width="40" height="${80 + ((i % 3) * 30)}" rx="8" fill="rgba(255,255,255,.5)"/>`
+             `<rect x="${60 + i * 60}" y="80" width="40" height="${
+               80 + (i % 3) * 30
+             }" rx="8" fill="rgba(255,255,255,.6)"/>`
          )
          .join("")}
-       <rect x="60" y="240" width="520" height="10" rx="5" fill="rgba(255,255,255,.6)"/>
      </g>` +
     END
 );
 
-// NLP / Fake-or-Real: beige -> lavender with glyphs
+// NLP / Fake or Real
 const FALLBACK_NLP = svgToDataUrl(
   FRAME("#d6c2a6", "#7c6f9f") +
-    `<g fill="rgba(255,255,255,.6)" font-family="ui-monospace, SFMono-Regular, Menlo" font-size="20">
-       <text x="80" y="150">{ text, label }</text>
-       <text x="80" y="185">tokenize(…)</text>
-       <text x="80" y="220">BERT → softmax</text>
+    `<g fill="rgba(255,255,255,.65)" font-family="monospace" font-size="18">
+       <text x="90" y="160">{text,label}</text>
+       <text x="90" y="190">→ tokenize()</text>
+       <text x="90" y="220">→ BERT → output</text>
      </g>` +
     END
 );
 
-// Space / Trojan Horse: midnight -> plum with stars
+// Space / Trojan Horse
 const FALLBACK_SPACE = svgToDataUrl(
   FRAME("#0b1026", "#4b2a50") +
-    `<g fill="rgba(255,255,255,.8)">
-       ${Array.from({ length: 40 })
+    `<g fill="rgba(255,255,255,.85)">
+       ${Array.from({ length: 35 })
          .map(() => {
            const x = Math.floor(Math.random() * 620) + 10;
            const y = Math.floor(Math.random() * 340) + 10;
-           const r = Math.random() * 1.8 + 0.6;
+           const r = Math.random() * 1.6 + 0.4;
            return `<circle cx="${x}" cy="${y}" r="${r}"/>`;
          })
          .join("")}
-     </g>
-     <g opacity=".35" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2">
-       <circle cx="470" cy="180" r="60"/>
-       <circle cx="470" cy="180" r="90" stroke-dasharray="8 10"/>
-       <circle cx="470" cy="180" r="120" stroke-dasharray="5 12"/>
      </g>` +
     END
 );
 
 /* -----------------------------
-   Small helper to render an <img> that swaps to fallback on error
+   Helper <img> with fallback
 ------------------------------ */
 function ImgWithFallback({
   src,
@@ -136,10 +125,10 @@ function ImgWithFallback({
   );
 }
 
+/* -----------------------------
+   Component
+------------------------------ */
 export default function Competitions() {
-  /* -----------------------------
-     Hosted competitions (you’re the organizer)
-  ------------------------------ */
   const hosted = [
     {
       id: "xray-a",
@@ -169,9 +158,6 @@ export default function Competitions() {
     },
   ];
 
-  /* -----------------------------
-     Participated competitions (manual order + your ranks)
-  ------------------------------ */
   const participated = [
     {
       id: "rsna",
