@@ -5,7 +5,7 @@ import Home from "./pages/Home";
 import Projects from "./pages/Projects";
 import Apps from "./pages/Apps";
 import AppDetails from "./pages/AppDetails";
-import Writing from "./pages/Competitions";
+import Competitions from "./pages/Competitions";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
