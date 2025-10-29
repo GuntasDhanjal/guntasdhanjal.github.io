@@ -73,7 +73,7 @@ export const HeroSection = () => {
               variant="outline"
               className="glass-card px-8 py-6 text-lg rounded-2xl hover:bg-accent/10 border-accent/30"
             >
-              <Link to="/writing">Read Writing</Link>
+              <Link to="/apps">Apps</Link>
             </Button>
           </div>
 
