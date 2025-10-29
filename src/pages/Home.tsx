@@ -19,34 +19,16 @@ const highlights = [
     link: "/projects",
   },
   {
-    title: "Health AI Research",
-    description: "Published research on AI for global health advancement.",
+    title: "Healthcare ML & AI projects",
+    description: "Competing in ML and AL competitions to solve real-world challenges.",
     image: researchImg,
-    link: "/writing",
+    link: "/competitions",
   },
-  {
-    title: "Gold Health Care App",
-    description: "Mobile app for healthcare staffing to receive assignments & set availability.",
-    image: goldHealthImg,
-    link: "/apps",
-  },
-  {
+    {
     title: "Nurse AI Application",
     description: "AI-powered nursing support and assistance for healthcare professionals.",
     image: nurseAiImg,
     link: "/apps",
-  },
-  {
-    title: "Behind the Dataset",
-    description: "Technical insights into crafting the X-Ray Slam dataset.",
-    image: xrayImg,
-    link: "/writing",
-  },
-  {
-    title: "Nonprofit & Community Work",
-    description: "Initiatives in health tech access and environmental service.",
-    image: communityImg,
-    link: "/about",
   },
 ];
 
