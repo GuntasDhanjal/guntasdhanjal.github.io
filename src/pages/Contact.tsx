@@ -140,17 +140,6 @@ const Contact = () => {
               <div className="glass-card rounded-3xl p-8 animate-fade-in" style={{ animationDelay: "100ms" }}>
                 <h2 className="text-2xl font-bold mb-6">Connect</h2>
                 
-                <div className="space-y-4 mb-8">
-                  <a
-                    href="mailto:youremail@example.com"
-                    className="flex items-center gap-3 text-foreground/80 hover:text-accent transition-colors group"
-                  >
-                    <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
-                      <Mail className="w-5 h-5 text-accent" />
-                    </div>
-                    <span className="text-sm">youremail@example.com</span>
-                  </a>
-                </div>
 
                 <h3 className="font-semibold mb-4 text-foreground/80">Social Media</h3>
                 <div className="space-y-3">
